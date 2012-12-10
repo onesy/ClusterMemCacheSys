@@ -7,6 +7,9 @@ public class OrderBufferLevel_1 {
 	
 	private static OrderBufferLevel_1  itself ;
 
+	/**
+	 * 初始化缓冲区队列
+	 */
 	private static ConcurrentLinkedQueue<String> ConfirmQueue = new ConcurrentLinkedQueue<String>();
 
 	private static ConcurrentLinkedQueue<String> DeleteQueue = new ConcurrentLinkedQueue<String>();
@@ -73,6 +76,14 @@ public class OrderBufferLevel_1 {
 		OrderBufferLevel_1.BufferLevel_1_Hash.put("VotWatcherReceipt", OrderBufferLevel_1.VotWatcherReceiptQueue);
 		OrderBufferLevel_1.BufferLevel_1_Hash.put("WatcherAS", OrderBufferLevel_1.WatcherASQueue);
 		OrderBufferLevel_1.BufferLevel_1_Hash.put("WatcherASK", OrderBufferLevel_1.WatcherASKQueue);
+	}
+	
+	public ConcurrentLinkedQueue<String> getQueue(String QueueName){
+		return OrderBufferLevel_1.BufferLevel_1_Hash.get(QueueName);
+	}
+	
+	public ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> getQueues(){
+		return OrderBufferLevel_1.BufferLevel_1_Hash;
 	}
 	
 	public synchronized static OrderBufferLevel_1 getInstance(){
