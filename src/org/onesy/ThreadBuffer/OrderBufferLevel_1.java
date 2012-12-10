@@ -51,6 +51,7 @@ public class OrderBufferLevel_1 {
 	private static ConcurrentLinkedQueue<String> WatcherASKQueue = new ConcurrentLinkedQueue<String>();
 
 	private static ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> BufferLevel_1_Hash = new ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>();
+
 	
 	/**
 	 * 初始化所有通道
@@ -85,6 +86,7 @@ public class OrderBufferLevel_1 {
 	public ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> getQueues(){
 		return OrderBufferLevel_1.BufferLevel_1_Hash;
 	}
+
 	
 	public synchronized static OrderBufferLevel_1 getInstance(){
 		if(null == OrderBufferLevel_1.itself){
