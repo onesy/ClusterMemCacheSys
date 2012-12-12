@@ -1,5 +1,7 @@
 package org.onesy.PaxosAl;
 
+import redis.clients.jedis.Jedis;
+
 public class PaxosNode {
 
 	private JedisNode jedisNode;
@@ -27,10 +29,10 @@ public class PaxosNode {
 	 * @param name
 	 * @param channel
 	 * @throws IllegalArgumentException
-	 * @description host和port为必须，如果没有设置或者设置的数值非法，会抛出异常，其他参数传null，默认为"default".
+	 * @description host,timeout,port为必须，如果没有设置或者设置的数值非法，会抛出异常，其他参数传null，默认为"default".
 	 * 				PaxosNode对象会根据收到的参数进行实例化jedisNode对象，并引用改对象
 	 */
-	public PaxosNode(String host, int port, String passwd, String name, String channel) throws IllegalArgumentException {
+	public PaxosNode(String host, int port, int timeout,String passwd, String name, String channel) throws IllegalArgumentException {
 		if (null == host || port < 0) {
 			throw new IllegalArgumentException();
 		}
@@ -39,8 +41,13 @@ public class PaxosNode {
 		this.setPasswd(passwd);
 		this.setName(name);
 		this.setChannel(channel);
+		this.setJedisNode(new JedisNode(host, port, timeout, passwd));
 	}
-
+	//redis 
+	public Jedis getShardedJedis(){
+		return this.getJedisNode().getJedisShardInfo().createResource();
+	}
+	
 	public JedisNode getJedisNode() {
 		return jedisNode;
 	}
