@@ -14,7 +14,6 @@ public class OrderInMQSend implements Runnable {
 			OutPutOrder order = OrderBufferLevel_3.OutBufferQueue.poll();
 			Jedis jedis = new Jedis(order.targetHost, order.port);
 			jedis.publish(order.Channel, order.Content);
-			jedis.disconnect();
 		}
 	}
 	
