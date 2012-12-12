@@ -1,5 +1,7 @@
 package org.onesy.MQ;
 
+import org.onesy.ThreadBuffer.OrderBufferLevel_1;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -39,9 +41,9 @@ public class OrderInMQRec extends JedisPubSub implements Runnable {
 	}
 
 	@Override
-	public void onMessage(String arg0, String arg1) {
+	public void onMessage(String channel, String message) {
 		// TODO Auto-generated method stub
-		System.out.println(arg0 + ":" + arg1);
+		System.out.println(channel + ":" + message);
 		//
 		/*
 		 * author = host::port::passwd
@@ -59,35 +61,39 @@ public class OrderInMQRec extends JedisPubSub implements Runnable {
 		 * 127.0.0.1::6379::passwd::123456789098765321::proposed::VotLeader::{内部结构不干涉但要附上version}
 		 */
 		
-	}
-
-	@Override
-	public void onPMessage(String arg0, String arg1, String arg2) {
-		// TODO Auto-generated method stub
-		System.out.println(arg0 + ":" + arg1 + ":" + arg2);
+		String hashKey = message.split("::")[5];
+		
+		OrderBufferLevel_1.getInstance().getQueue(hashKey).add(message);
 		
 	}
 
 	@Override
-	public void onPSubscribe(String arg0, int arg1) {
+	public void onPMessage(String pattern, String channel, String message) {
 		// TODO Auto-generated method stub
+		System.out.println(pattern + ":" + channel + ":" + message);
 		
 	}
 
 	@Override
-	public void onPUnsubscribe(String arg0, int arg1) {
+	public void onPSubscribe(String channel, int subscribedChannels) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onSubscribe(String arg0, int arg1) {
+	public void onPUnsubscribe(String pattern, int subscribedChannels) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onUnsubscribe(String arg0, int arg1) {
+	public void onSubscribe(String channel, int subscribedChannels) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUnsubscribe(String channel, int subscribedChannels) {
 		// TODO Auto-generated method stub
 		
 	}
