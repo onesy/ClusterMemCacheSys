@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClusterInfoMap {
 
+	private static ClusterInfoMap clusterInfoMap;
+
 	/**
 	 * tmp vars
 	 */
@@ -42,14 +44,60 @@ public class ClusterInfoMap {
 
 	public static ConcurrentHashMap<String, String> LocalNodeInfo;
 
-	private ClusterInfoMap() throws Exception {
+	public synchronized static ClusterInfoMap getInstanceC() {
+		if (null == ClusterInfoMap.clusterInfoMap) {
+			ClusterInfoMap.clusterInfoMap = new ClusterInfoMap();
+		}
+		return ClusterInfoMap.clusterInfoMap;
+	}
+
+	private ClusterInfoMap() {
 		// 从用户目录下的指定文件进行初始化
 		// path = ~/.cmcs/NodesConfigure
 		// TODO
-		File dir = new File(System.getProperty("user.home") + File.pathSeparator + ".cmcs");
-		if (! dir.exists()) {
+		File dir = new File(System.getProperty("user.home") + File.separator
+				+ ".cmcs" + File.separator);
+		File nodefile = new File(System.getProperty("user.home")
+				+ File.separator + ".cmcs" + File.separator + "NodesConfigure");
+		File localfile = new File(System.getProperty("user.home")
+				+ File.separator + ".cmcs" + File.separator + "localConfigure");
+		File SysConfigure = new File(System.getProperty("user.home") + File.separator + "SysConfigure.properties");
+		// 检查文件夹是否存在
+		if (!dir.exists()) {
 			dir.mkdirs();
-			throw new Exception("没有父目录，已经自动创建，需要用户自行创建配置文件");
+		}
+		// 检查节点文件是否存在
+		if (!nodefile.exists()) {
+			try {
+				nodefile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("节点信息文件不存在，且创建失败");
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
+		// 检查本地文件是否存在
+		if (!localfile.exists()) {
+			try {
+				localfile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("本地节点信息不存在，且创建失败");
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
+		//检查属性配置文件是否存在
+		if (!SysConfigure.exists()) {
+			try {
+				SysConfigure.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("系统配置文件不存在。且创建失败");
+				e.printStackTrace();
+				System.exit(-1);
+			}
 		}
 		NodesConfiger("NodesConfigure", "NODES");
 		NodesConfiger("localConfigure", "LOCAL");
