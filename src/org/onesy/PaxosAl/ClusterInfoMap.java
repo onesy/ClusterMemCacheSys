@@ -2,6 +2,7 @@ package org.onesy.PaxosAl;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.onesy.tools.FileUtil;
@@ -11,36 +12,13 @@ public class ClusterInfoMap {
 	private static ClusterInfoMap clusterInfoMap;
 
 	/**
-	 * tmp vars
-	 */
-	private String host = null;
-	/**
-	 * tmp vars
-	 */
-	private int port = 0;
-	/**
-	 * tmp vars
-	 */
-	private int DB = 0;
-	/**
-	 * tmp vars
-	 */
-	private String passwd = null;
-	/**
-	 * tmp vars
-	 */
-	private String Channel = null;
-	/**
-	 * tmp vars
-	 */
-	private String name = null;
-
-	/**
 	 * Key = host:port:DB:channel
 	 */
-	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes;
+	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 
-	public static ConcurrentHashMap<String, String> LocalNodeInfo;
+	public static Vector<String> KeySet = new Vector<String>();
+
+	public static ConcurrentHashMap<String, String> LocalNodeInfo = new ConcurrentHashMap<String, String>();
 
 	public static Properties properties;
 
@@ -53,8 +31,9 @@ public class ClusterInfoMap {
 
 	private ClusterInfoMap() {
 		// 从用户目录下的指定文件进行初始化
-		// path = ~/.cmcs/NodesConfigure
-		// TODO
+		// nodespath = ~/.cmcs/NodesConfig/nodesConfigure.properties
+		// localpath = ~/.cmcs/LocalConfig/localConfigure.properties
+		// sysconfigpath = ~/.cmcs/SysConfigure.properties
 
 		boolean exitFlg = false;
 
@@ -80,26 +59,44 @@ public class ClusterInfoMap {
 		exitFlg |= FileUtil.FileCheckCreate(nodefile, false);
 		if (exitFlg) {
 			System.err.println("配置文件不完全，程序已经自动创建，请补充配置文件，本次程序即将退出");
+			System.exit(-1);
 		}
 		ClusterInfoMap.properties = FileUtil.getAsProperties(SysConfigure);
+		// 初始化本地节点
+		// System.out.println("prefix=" +
+		// ClusterInfoMap.properties.getProperty("prefix") + " and tail=" +
+		// ClusterInfoMap.properties.getProperty("tail"));
+		Properties propertiesLocal = FileUtil.getAsProperties(localfile);
+		this.NodeCreater("LOCALNODE", propertiesLocal.getProperty("host"),
+				Integer.parseInt(propertiesLocal.getProperty("port")),
+				Integer.parseInt(propertiesLocal.getProperty("db")),
+				propertiesLocal.getProperty("passwd"),
+				propertiesLocal.getProperty("Channel"),
+				propertiesLocal.getProperty("name"));
+		// 初始化其他节点
 		Properties propertiesNodes = FileUtil.getAsProperties(nodefile);
-		for (int i = 0; i < 2;) {
-			String value = propertiesNodes
-					.getProperty(ClusterInfoMap.properties
-							.getProperty("prefix") + "_" + i + ".properties");
-			if (null == value) {
+		for (int i = 1; ; i ++) {
+			String path = propertiesNodes.getProperty(ClusterInfoMap.properties
+					.getProperty("prefix") + "_" + i);
+			if (null == path) {
+				System.err.println("第 "+ i +" 个节点文件未能找到，程序认为已经到达配置文件末端");
 				break;
 			}
-			Properties tmpproper = FileUtil.getAsProperties(new File(
-					nodesFolder + File.separator + value));
-			asdasd
-
+			Properties tmpProper = FileUtil.getAsProperties(new File(
+					nodesFolder + File.separator + path));
+			System.err.println(tmpProper.getProperty("host") + ":" + tmpProper.getProperty("port") + ":" + tmpProper.getProperty("db"));
+			this.NodeCreater("NODES", tmpProper.getProperty("host"),
+					Integer.parseInt(tmpProper.getProperty("port")),
+					Integer.parseInt(tmpProper.getProperty("db")),
+					tmpProper.getProperty("passwd"),
+					tmpProper.getProperty("Channel"),
+					tmpProper.getProperty("name"));
 		}
 	}
 
 	private void NodeCreater(String kind, String host, int port, int DB,
 			String passwd, String Channel, String name) {
-		if (host.endsWith(null) || 0 == port || Channel.endsWith(null)) {
+		if (host == null || 0 == port || Channel == null) {
 			System.err.println("节点信息不完全，放弃生成该节点");
 			return;
 		}
@@ -108,6 +105,7 @@ public class ClusterInfoMap {
 		}
 		String key = host + ":" + port + ":" + DB + ":" + Channel;
 		if (kind.equalsIgnoreCase("LOCALNODE")) {
+			System.err.println("LOCALNODE:" + host + ":" + port + ":" + DB);
 			ClusterInfoMap.LocalNodeInfo.put("HOST", host);
 			ClusterInfoMap.LocalNodeInfo.put("PORT", port + "");
 			ClusterInfoMap.LocalNodeInfo.put("DB", DB + "");
@@ -119,22 +117,6 @@ public class ClusterInfoMap {
 		PaxosNode paxosNode = new PaxosNode(host, port, 500, passwd, name,
 				Channel);
 		ClusterInfoMap.PaxosNodes.put(key, paxosNode);
+		ClusterInfoMap.KeySet.add(key);
 	}
-
-	private void AttributeAdder(String name, String value) {
-		if (name.equalsIgnoreCase("HOST")) {
-			this.host = new String(value);
-		} else if (name.equalsIgnoreCase("PORT")) {
-			this.port = new Integer(Integer.parseInt(value));
-		} else if (name.equalsIgnoreCase("DB")) {
-			this.DB = new Integer(Integer.parseInt(value));
-		} else if (name.equalsIgnoreCase("NAME")) {
-			this.name = new String(value);
-		} else if (name.equalsIgnoreCase("PASSWD")) {
-			this.passwd = new String(value);
-		} else if (name.equalsIgnoreCase("CHANNEL")) {
-			this.Channel = new String(value);
-		}
-	}
-
 }
