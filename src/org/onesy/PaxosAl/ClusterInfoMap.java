@@ -1,12 +1,10 @@
 package org.onesy.PaxosAl;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.onesy.tools.FileUtil;
 
 public class ClusterInfoMap {
 
@@ -44,6 +42,8 @@ public class ClusterInfoMap {
 
 	public static ConcurrentHashMap<String, String> LocalNodeInfo;
 
+	public static Properties properties;
+
 	public synchronized static ClusterInfoMap getInstanceC() {
 		if (null == ClusterInfoMap.clusterInfoMap) {
 			ClusterInfoMap.clusterInfoMap = new ClusterInfoMap();
@@ -55,93 +55,52 @@ public class ClusterInfoMap {
 		// 从用户目录下的指定文件进行初始化
 		// path = ~/.cmcs/NodesConfigure
 		// TODO
+
+		boolean exitFlg = false;
+
+		File SysConfigure = new File(System.getProperty("user.home")
+				+ File.separator + ".cmcs" + File.separator
+				+ "SysConfigure.properties");
 		File dir = new File(System.getProperty("user.home") + File.separator
 				+ ".cmcs" + File.separator);
-		File nodefile = new File(System.getProperty("user.home")
-				+ File.separator + ".cmcs" + File.separator + "NodesConfigure");
-		File localfile = new File(System.getProperty("user.home")
-				+ File.separator + ".cmcs" + File.separator + "localConfigure");
-		File SysConfigure = new File(System.getProperty("user.home") + File.separator + "SysConfigure.properties");
-		// 检查文件夹是否存在
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
-		// 检查节点文件是否存在
-		if (!nodefile.exists()) {
-			try {
-				nodefile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println("节点信息文件不存在，且创建失败");
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-		// 检查本地文件是否存在
-		if (!localfile.exists()) {
-			try {
-				localfile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println("本地节点信息不存在，且创建失败");
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-		//检查属性配置文件是否存在
-		if (!SysConfigure.exists()) {
-			try {
-				SysConfigure.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println("系统配置文件不存在。且创建失败");
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-		NodesConfiger("NodesConfigure", "NODES");
-		NodesConfiger("localConfigure", "LOCAL");
-	}
+		File localFolder = new File(System.getProperty("user.home")
+				+ File.separator + ".cmcs" + File.separator + "LocalConfig");
+		File nodesFolder = new File(System.getProperty("user.home")
+				+ File.separator + ".cmcs" + File.separator + "NodesConfig");
+		File nodefile = new File(nodesFolder.getAbsolutePath() + File.separator
+				+ "nodesConfigure.properties");
+		File localfile = new File(localFolder.getAbsolutePath()
+				+ File.separator + "localConfigure.properties");
 
-	private void NodesConfiger(String filename, String Node) {
-
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(System.getProperty("user.home")
-							+ File.separator + ".cmcs" + File.separator
-							+ filename)));
-			for (String line = br.readLine(); line != null; br.readLine()) {
-				if (line.startsWith("##")) {
-					this.NodeCreater(Node, host, port, DB, passwd, Channel,
-							name);
-					host = null;
-					port = 0;
-					DB = 0;
-					passwd = null;
-					Channel = null;
-					name = null;
-					continue;
-				}
-				if (line.startsWith("#")) {
-					continue;
-				}
-				String[] nameValue = line.split(":=");
-				if (nameValue.length >= 2) {
-					this.AttributeAdder(nameValue[0], nameValue[1]);
-				}
+		exitFlg |= FileUtil.FileCheckCreate(dir, true);
+		exitFlg |= FileUtil.FileCheckCreate(SysConfigure, false);
+		exitFlg |= FileUtil.FileCheckCreate(localFolder, true);
+		exitFlg |= FileUtil.FileCheckCreate(nodesFolder, true);
+		exitFlg |= FileUtil.FileCheckCreate(localfile, false);
+		exitFlg |= FileUtil.FileCheckCreate(nodefile, false);
+		if (exitFlg) {
+			System.err.println("配置文件不完全，程序已经自动创建，请补充配置文件，本次程序即将退出");
+		}
+		ClusterInfoMap.properties = FileUtil.getAsProperties(SysConfigure);
+		Properties propertiesNodes = FileUtil.getAsProperties(nodefile);
+		for (int i = 0; i < 2;) {
+			String value = propertiesNodes
+					.getProperty(ClusterInfoMap.properties
+							.getProperty("prefix") + "_" + i + ".properties");
+			if (null == value) {
+				break;
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Properties tmpproper = FileUtil.getAsProperties(new File(
+					nodesFolder + File.separator + value));
+			asdasd
+
 		}
 	}
 
 	private void NodeCreater(String kind, String host, int port, int DB,
 			String passwd, String Channel, String name) {
 		if (host.endsWith(null) || 0 == port || Channel.endsWith(null)) {
+			System.err.println("节点信息不完全，放弃生成该节点");
 			return;
 		}
 		if (DB == 0) {
