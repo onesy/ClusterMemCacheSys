@@ -13,6 +13,7 @@ public class ClusterInfoMap {
 
 	/**
 	 * Key = host:port:DB:channel
+	 * TODO
 	 */
 	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 
@@ -63,9 +64,6 @@ public class ClusterInfoMap {
 		}
 		ClusterInfoMap.properties = FileUtil.getAsProperties(SysConfigure);
 		// 初始化本地节点
-		// System.out.println("prefix=" +
-		// ClusterInfoMap.properties.getProperty("prefix") + " and tail=" +
-		// ClusterInfoMap.properties.getProperty("tail"));
 		Properties propertiesLocal = FileUtil.getAsProperties(localfile);
 		this.NodeCreater("LOCALNODE", propertiesLocal.getProperty("host"),
 				Integer.parseInt(propertiesLocal.getProperty("port")),
@@ -79,7 +77,7 @@ public class ClusterInfoMap {
 			String path = propertiesNodes.getProperty(ClusterInfoMap.properties
 					.getProperty("prefix") + "_" + i);
 			if (null == path) {
-				System.err.println("第 "+ i +" 个节点文件未能找到，程序认为已经到达配置文件末端");
+				System.err.println("第 "+ i +" 个节点文件未能找到，程序认为已经到达配置节点的末端");
 				break;
 			}
 			Properties tmpProper = FileUtil.getAsProperties(new File(
