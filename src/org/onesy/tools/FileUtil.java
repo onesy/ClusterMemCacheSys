@@ -2,23 +2,22 @@ package org.onesy.tools;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
 public class FileUtil {
 
-	public static Properties getAsProperties(File file) {
+	public static Properties getAsProperties(File file){
 
 		Properties properties = new Properties();
 
 		try {
+			if(!file.exists()){
+				return null;
+			}
 			FileInputStream in = new FileInputStream(file);
 			properties.load(in);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
