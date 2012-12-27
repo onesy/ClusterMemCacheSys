@@ -15,6 +15,7 @@ public class ClusterInfoMap {
 	 * Key = host:port:DB:channel
 	 * TODO
 	 */
+	asds
 	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 
 	public static Vector<String> KeySet = new Vector<String>();
