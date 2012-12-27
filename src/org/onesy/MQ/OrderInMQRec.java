@@ -61,9 +61,12 @@ public class OrderInMQRec extends JedisPubSub implements Runnable {
 		 * 127.0.0.1::6379::passwd::123456789098765321::proposed::VotLeader::{内部结构不干涉但要附上version}
 		 */
 		
+		/**
+		 * while the normal process can run this should be useing
 		String hashKey = message.split("::")[5];
 		
 		OrderBufferLevel_1.getInstance().getQueue(hashKey).add(message);
+		*/
 		
 	}
 
