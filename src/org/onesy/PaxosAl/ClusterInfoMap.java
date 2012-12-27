@@ -1,6 +1,7 @@
 package org.onesy.PaxosAl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,8 +13,7 @@ public class ClusterInfoMap {
 	private static ClusterInfoMap clusterInfoMap;
 
 	/**
-	 * Key = host:port:DB:channel
-	 * TODO
+	 * Key = host:port:DB:channel TODO
 	 */
 	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 
@@ -62,9 +62,20 @@ public class ClusterInfoMap {
 			System.err.println("配置文件不完全，程序已经自动创建，请补充配置文件，本次程序即将退出");
 			System.exit(-1);
 		}
-		ClusterInfoMap.properties = FileUtil.getAsProperties(SysConfigure);
+		Properties propertiesLocal = null;
+		Properties propertiesNodes = null;
+		try {
+			ClusterInfoMap.properties = FileUtil.getAsProperties(SysConfigure);
+			propertiesLocal = FileUtil.getAsProperties(localfile);
+			propertiesNodes = FileUtil.getAsProperties(nodefile);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.err.println("配置文件错误，文件" + localfile.getAbsolutePath()
+					+ "未找到");
+			System.exit(-1);
+		}
 		// 初始化本地节点
-		Properties propertiesLocal = FileUtil.getAsProperties(localfile);
 		this.NodeCreater("LOCALNODE", propertiesLocal.getProperty("host"),
 				Integer.parseInt(propertiesLocal.getProperty("port")),
 				Integer.parseInt(propertiesLocal.getProperty("db")),
@@ -72,17 +83,29 @@ public class ClusterInfoMap {
 				propertiesLocal.getProperty("Channel"),
 				propertiesLocal.getProperty("name"));
 		// 初始化其他节点
-		Properties propertiesNodes = FileUtil.getAsProperties(nodefile);
-		for (int i = 1; ; i ++) {
+		for (int i = 1;; i++) {
 			String path = propertiesNodes.getProperty(ClusterInfoMap.properties
 					.getProperty("prefix") + "_" + i);
 			if (null == path) {
-				System.err.println("第 "+ i +" 个节点文件未能找到，程序认为已经到达配置节点的末端");
+				System.err.println("第 " + i + " 个节点文件未能找到，程序认为已经到达配置节点的末端");
 				break;
 			}
-			Properties tmpProper = FileUtil.getAsProperties(new File(
-					nodesFolder + File.separator + path));
-			System.err.println(tmpProper.getProperty("host") + ":" + tmpProper.getProperty("port") + ":" + tmpProper.getProperty("db"));
+			Properties tmpProper = null;
+			tmpProper = FileUtil.getAsProperties(new File(nodesFolder
+					+ File.separator + path));
+			if (null == tmpProper) {
+				System.err.println("文件"
+						+ new File(nodesFolder + File.separator + path)
+								.getAbsolutePath() + "未能找到");
+				System.err.println("该文件为第" + i + "个文件");
+				break;
+			}
+			System.err.println(tmpProper.getProperty("host") + ":"
+					+ tmpProper.getProperty("port") + ":"
+					+ tmpProper.getProperty("db"));
+
+			// TODO Auto-generated catch block
+
 			this.NodeCreater("NODES", tmpProper.getProperty("host"),
 					Integer.parseInt(tmpProper.getProperty("port")),
 					Integer.parseInt(tmpProper.getProperty("db")),
