@@ -55,7 +55,10 @@ public class MQThreadsManagementD implements Runnable {
 	 */
 	private void CrtRecverAddToList(int receiversCount) {
 		for (int i = 0; i < receiversCount; i++) {
-			MQThreadsManagementD.getRecThreads().add(i, this.LocalRecThread());
+			Thread th = this.LocalRecThread();
+			//TODO 加上这一行，异常线程转储的逻辑需要修改
+			th.setName("receiver_" + i);
+			MQThreadsManagementD.getRecThreads().add(i, th);
 		}
 	}
 
@@ -66,7 +69,10 @@ public class MQThreadsManagementD implements Runnable {
 	 */
 	private void CrtSnderAddToList(int sendersCount) {
 		for (int i = 0; i < sendersCount; i++) {
-			MQThreadsManagementD.getSendThreads().add(i, this.LocalSendThread());
+			Thread th = this.LocalSendThread();
+			th.setName("sender_" + i);
+			//TODO 加上这一行，异常线程转储的逻辑需要修改
+			MQThreadsManagementD.getSendThreads().add(i, th);
 		}
 	}
 
