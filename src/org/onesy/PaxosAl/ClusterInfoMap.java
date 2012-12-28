@@ -17,6 +17,15 @@ public class ClusterInfoMap {
 
 	private File nodesFolder;
 
+	/**
+	 * SYSTEM CONFIGURE LIST
+	 * ------------------------------
+	 * logPath
+	 * receiverCount
+	 * senderCount
+	 * 
+	 * ------------------------------
+	 */
 	private File SysConfigure;
 
 	private File nodefile;
@@ -24,7 +33,7 @@ public class ClusterInfoMap {
 	private File localfile;
 
 	/**
-	 * Key = host:port:DB:channel
+	 * Key = node_x.properties
 	 */
 	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 

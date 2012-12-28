@@ -1,6 +1,5 @@
 package org.onesy.MainPower;
 
-import org.onesy.MQ.OrderInMQRec;
 import org.onesy.PaxosAl.ClusterInfoMap;
 
 public class CMCSMainPower {
