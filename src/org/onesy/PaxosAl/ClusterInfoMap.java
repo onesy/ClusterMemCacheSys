@@ -1,8 +1,8 @@
 package org.onesy.PaxosAl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.onesy.tools.FileUtil;
@@ -10,25 +10,25 @@ import org.onesy.tools.FileUtil;
 public class ClusterInfoMap {
 
 	private static ClusterInfoMap clusterInfoMap;
-	
+
 	private File localFolder;
-	
+
 	private File dir;
-	
+
 	private File nodesFolder;
-	
+
 	private File SysConfigure;
-	
+
 	private File nodefile;
-	
+
 	private File localfile;
 
 	/**
-	 * Key = host:port:DB:channel 
+	 * Key = host:port:DB:channel
 	 */
 	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 
-	public static Vector<String> KeySet = new Vector<String>();
+	public static ArrayList<String> KeySet = new ArrayList<String>();
 
 	public static ConcurrentHashMap<String, String> LocalNodeInfo = new ConcurrentHashMap<String, String>();
 
@@ -42,47 +42,47 @@ public class ClusterInfoMap {
 	}
 
 	private ClusterInfoMap() {
-		
+
 		this.PathAssembly();
-		
+
 		if (CheckFiles()) {
 			System.err.println("配置文件不完全，程序已经自动创建，请补充配置文件，本次程序即将退出");
 			System.exit(-1);
 		}
-		
+
 		/**
 		 * 初始化全部节点和配置文件
 		 */
 		InitialNodes(SysConfigure, localfile, nodefile);
-		
-	}
-	
-	private void PathAssembly(){
-		
-		// 从用户目录下的指定文件进行初始化
-				// nodespath = ~/.cmcs/NodesConfig/nodesConfigure.properties
-				// localpath = ~/.cmcs/LocalConfig/localConfigure.properties
-				// sysconfigpath = ~/.cmcs/SysConfigure.properties
 
-				SysConfigure = new File(System.getProperty("user.home")
-						+ File.separator + ".cmcs" + File.separator
-						+ "SysConfigure.properties");
-				dir = new File(System.getProperty("user.home") + File.separator
-						+ ".cmcs" + File.separator);
-				localFolder = new File(System.getProperty("user.home")
-						+ File.separator + ".cmcs" + File.separator + "LocalConfig");
-				nodesFolder = new File(System.getProperty("user.home")
-						+ File.separator + ".cmcs" + File.separator + "NodesConfig");
-				nodefile = new File(nodesFolder.getAbsolutePath() + File.separator
-						+ "nodesConfigure.properties");
-				localfile = new File(localFolder.getAbsolutePath()
-						+ File.separator + "localConfigure.properties");
 	}
-	
-	private boolean CheckFiles(){
-		
+
+	private void PathAssembly() {
+
+		// 从用户目录下的指定文件进行初始化
+		// nodespath = ~/.cmcs/NodesConfig/nodesConfigure.properties
+		// localpath = ~/.cmcs/LocalConfig/localConfigure.properties
+		// sysconfigpath = ~/.cmcs/SysConfigure.properties
+
+		SysConfigure = new File(System.getProperty("user.home")
+				+ File.separator + ".cmcs" + File.separator
+				+ "SysConfigure.properties");
+		dir = new File(System.getProperty("user.home") + File.separator
+				+ ".cmcs" + File.separator);
+		localFolder = new File(System.getProperty("user.home") + File.separator
+				+ ".cmcs" + File.separator + "LocalConfig");
+		nodesFolder = new File(System.getProperty("user.home") + File.separator
+				+ ".cmcs" + File.separator + "NodesConfig");
+		nodefile = new File(nodesFolder.getAbsolutePath() + File.separator
+				+ "nodesConfigure.properties");
+		localfile = new File(localFolder.getAbsolutePath() + File.separator
+				+ "localConfigure.properties");
+	}
+
+	private boolean CheckFiles() {
+
 		boolean exitFlag = false;
-		
+
 		exitFlag |= FileUtil.FileCheckCreate(dir, true);
 		exitFlag |= FileUtil.FileCheckCreate(SysConfigure, false);
 		exitFlag |= FileUtil.FileCheckCreate(localFolder, true);
@@ -91,11 +91,11 @@ public class ClusterInfoMap {
 		exitFlag |= FileUtil.FileCheckCreate(nodefile, false);
 		return exitFlag;
 	}
-	
+
 	/**
 	 * 初始化全部节点和配置文件
 	 */
-	private void InitialNodes(File SysConfigure,File localfile, File nodefile){
+	private void InitialNodes(File SysConfigure, File localfile, File nodefile) {
 		Properties propertiesLocal = null;
 		Properties propertiesNodes = null;
 		try {
@@ -110,7 +110,7 @@ public class ClusterInfoMap {
 			System.exit(-1);
 		}
 		// 初始化本地节点
-		this.CreaterEncapsulation("LOCALNODE", propertiesLocal);
+		this.CreaterEncapsulation("LOCALNODE", "LOCAL", propertiesLocal);
 		// 初始化其他节点
 		for (int i = 1;; i++) {
 			String path = propertiesNodes.getProperty(ClusterInfoMap.properties
@@ -132,24 +132,27 @@ public class ClusterInfoMap {
 			System.err.println(tmpProper.getProperty("host") + ":"
 					+ tmpProper.getProperty("port") + ":"
 					+ tmpProper.getProperty("db"));
-			//初始化节点
-			this.CreaterEncapsulation("NODES", tmpProper);
+			// 初始化节点
+			this.CreaterEncapsulation("NODES",
+					ClusterInfoMap.properties.getProperty("prefix") + "_" + i,
+					tmpProper);
 		}
 	}
-	
-	private void CreaterEncapsulation(String Kind,Properties properties){
-		
-		this.NodeCreater(Kind, properties.getProperty("host"),
+
+	private void CreaterEncapsulation(String Kind, String Key,
+			Properties properties) {
+
+		this.NodeCreater(Kind, Key, properties.getProperty("host"),
 				Integer.parseInt(properties.getProperty("port")),
 				Integer.parseInt(properties.getProperty("db")),
 				properties.getProperty("passwd"),
 				properties.getProperty("Channel"),
 				properties.getProperty("name"));
-		
+
 	}
 
-	private void NodeCreater(String kind, String host, int port, int DB,
-			String passwd, String Channel, String name) {
+	private void NodeCreater(String kind, String Key, String host, int port,
+			int DB, String passwd, String Channel, String name) {
 		if (host == null || 0 == port || Channel == null) {
 			System.err.println("节点信息不完全，放弃生成该节点");
 			return;
@@ -157,7 +160,7 @@ public class ClusterInfoMap {
 		if (DB == 0) {
 			DB = 1;
 		}
-		String key = host + ":" + port + ":" + DB + ":" + Channel;
+
 		if (kind.equalsIgnoreCase("LOCALNODE")) {
 			System.err.println("LOCALNODE:" + host + ":" + port + ":" + DB);
 			ClusterInfoMap.LocalNodeInfo.put("HOST", host);
@@ -170,7 +173,7 @@ public class ClusterInfoMap {
 		}
 		PaxosNode paxosNode = new PaxosNode(host, port, 500, passwd, name,
 				Channel);
-		ClusterInfoMap.PaxosNodes.put(key, paxosNode);
-		ClusterInfoMap.KeySet.add(key);
+		ClusterInfoMap.PaxosNodes.put(Key, paxosNode);
+		ClusterInfoMap.KeySet.add(Key);
 	}
 }

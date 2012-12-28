@@ -12,6 +12,8 @@ public class OrderInMQRec extends JedisPubSub implements Runnable {
 	private Jedis jedis;
 	
 	private String channel;
+	//test
+	long count = 0;
 	
 	private OrderInMQRec(String host,int port,String channel){
 		this.setJedis(new Jedis(host, port));
@@ -43,7 +45,7 @@ public class OrderInMQRec extends JedisPubSub implements Runnable {
 	@Override
 	public void onMessage(String channel, String message) {
 		// TODO Auto-generated method stub
-		System.out.println(channel + ":" + message);
+		System.out.println("count:" + ++count + " Channel:" + channel + " message:" + message);
 		//
 		/*
 		 * author = host::port::passwd

@@ -1,11 +1,11 @@
 package org.onesy.ThreadBuffer;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.onesy.OrderBeans.OutPutOrder;
 
 public class  OrderBufferLevel_3{
 	
-	public static ConcurrentLinkedQueue<OutPutOrder> OutBufferQueue = new ConcurrentLinkedQueue<OutPutOrder>();
+	public static LinkedBlockingQueue<OutPutOrder> OutBufferQueue = new LinkedBlockingQueue<OutPutOrder>(500);
 	
 }
