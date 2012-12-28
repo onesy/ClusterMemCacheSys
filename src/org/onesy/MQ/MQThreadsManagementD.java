@@ -25,6 +25,8 @@ public class MQThreadsManagementD implements Runnable {
 	private static LinkedList<OutPutOrder> ErrorOccuSendMsgDumps = new LinkedList<OutPutOrder>();
 	// 线程异常的输入对象转储链表
 	private static LinkedList<MQRecErrOccuBean> MQRecErrOccuDumps = new LinkedList<MQRecErrOccuBean>();
+	// 线程异常通告链表 出异常的线程名称被记录在这个链表中
+	private static LinkedList<String> ErrThreadNameList = new LinkedList<String>();
 
 	@Override
 	public void run() {
@@ -43,6 +45,13 @@ public class MQThreadsManagementD implements Runnable {
 
 		for (;;) {
 			// 守护进程检查线程们是否正常运行
+			// 检查 线程异常通告链表
+			// 检查 线程异常的输入对象转储链表
+			// 处理线程异常导致的异常输入对象（专用线程处理,流程较为复杂）
+			// 检查 线程异常的输出对象转储链表
+			// 处理线程异常导致的异常输出对象（专用线程处理，流程较为复杂）
+			// 检查 本机Redis是否正常
+			发出错误，记得更改这里，记得接收线程和发送线程的异常处理都需要加入新的线程处理
 		}
 
 	}
