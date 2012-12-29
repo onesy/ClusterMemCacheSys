@@ -30,7 +30,7 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		if(CMCS_ConstantsTable.DEBUG)
+		if(CMCS_ConstantsTable.MQRecD_DEBUG)
 			System.out.println("a OrderInMQRecD thread run!");
 		this.getJedis().subscribe(OrderInMQRecD.orderInMQRec, this.channel);
 	}
@@ -55,14 +55,14 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 	public void onMessage(String channel, String message) {
 		// TODO Auto-generated method stub
 		try {
-			if (CMCS_ConstantsTable.DEBUG)
+			if (CMCS_ConstantsTable.MQRecD_DEBUG)
 				System.out.println("count:" + ++count + " Channel:" + channel
 						+ " message:" + message);
 		} catch (Exception e) {
 			// TODO: handle exception
 			// 转储一个异常对象class = MQRecErrOccuBean
 			UUID uuid = UUID.randomUUID();
-			if (CMCS_ConstantsTable.DEBUG)
+			if (CMCS_ConstantsTable.MQRecD_DEBUG)
 				System.out.println("消息接受或者处理过程中遭遇到异常错误ID=" + uuid.toString()
 						+ ",错误已经转储请到控制台查看。");
 			// 转储错误对象
@@ -79,7 +79,7 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 			// 将本线程排入异常线程链表
 			CMCS_ThreadTools.PutIntoErrorList(Thread.currentThread(),
 					MQThreadsManagementD.getInstance());
-			if (CMCS_ConstantsTable.DEBUG)
+			if (CMCS_ConstantsTable.MQRecD_DEBUG)
 				System.out.println("错误消息、当前处理消息、异常线程对象已经被转储。线程应正常退出");
 		}
 		//

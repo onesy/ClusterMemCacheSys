@@ -69,7 +69,7 @@ public class MQThreadsManagementD implements Runnable {
 
 			// 发出错误，记得更改这里，记得接收线程和发送线程的异常处理都需要加入新的线程处理
 
-			if (CMCS_ConstantsTable.MQDEBUG && CMCS_ConstantsTable.DEBUG) {
+			if (CMCS_ConstantsTable.MQ_MANAGERD_DEBUG && CMCS_ConstantsTable.DEBUG) {
 				System.exit(-2);
 			}
 
@@ -79,7 +79,7 @@ public class MQThreadsManagementD implements Runnable {
 
 	private void CheckThreads() {
 
-		if (CMCS_ConstantsTable.CHECKTHREADDEBUG)
+		if (CMCS_ConstantsTable.CHECKTHREAD_DEBUG)
 			System.err.println("CheckThreads");
 		int Iter;
 		synchronized (recThreads) {

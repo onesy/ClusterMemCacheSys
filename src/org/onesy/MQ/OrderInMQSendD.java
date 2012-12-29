@@ -27,7 +27,7 @@ public class OrderInMQSendD implements Runnable {
 					jedis.publish(order.Channel, order.Content);// <-
 					jedis.quit();
 				}
-				if (CMCS_ConstantsTable.MQ_EXCEPTION_DEBUG) {
+				if (CMCS_ConstantsTable.MQSendD_DEBUG) {
 					throw new Exception("just dead");
 				}
 
@@ -53,7 +53,7 @@ public class OrderInMQSendD implements Runnable {
 					ErrorRememberer.getErrExceptionsList().add(rBean);
 				}
 				// 退出
-				if (CMCS_ConstantsTable.DEBUG)
+				if (CMCS_ConstantsTable.MQSendD_DEBUG)
 					System.out.println("a OrderInMQSendD occu a exception!");
 				return;
 			}
