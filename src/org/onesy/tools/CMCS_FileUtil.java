@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class FileUtil {
+public class CMCS_FileUtil {
 
 	public static Properties getAsProperties(File file){
 

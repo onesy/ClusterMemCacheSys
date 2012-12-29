@@ -6,6 +6,8 @@ import org.onesy.ErrorProcessor.ErrorExceptionBean;
 import org.onesy.ErrorProcessor.ErrorRememberer;
 import org.onesy.OrderBeans.MQRecErrOccuBean;
 import org.onesy.ThreadBuffer.OrderBufferLevel_1;
+import org.onesy.tools.CMCS_ConstantsTable;
+import org.onesy.tools.CMCS_ThreadTools;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -28,6 +30,8 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		if(CMCS_ConstantsTable.DEBUG)
+			System.out.println("a OrderInMQRecD thread run!");
 		this.getJedis().subscribe(OrderInMQRecD.orderInMQRec, this.channel);
 	}
 
@@ -51,14 +55,16 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 	public void onMessage(String channel, String message) {
 		// TODO Auto-generated method stub
 		try {
-			System.out.println("count:" + ++count + " Channel:" + channel
-					+ " message:" + message);
+			if (CMCS_ConstantsTable.DEBUG)
+				System.out.println("count:" + ++count + " Channel:" + channel
+						+ " message:" + message);
 		} catch (Exception e) {
 			// TODO: handle exception
 			// 转储一个异常对象class = MQRecErrOccuBean
 			UUID uuid = UUID.randomUUID();
-			System.out.println("消息接受或者处理过程中遭遇到异常错误ID=" + uuid.toString()
-					+ ",错误已经转储请到控制台查看。");
+			if (CMCS_ConstantsTable.DEBUG)
+				System.out.println("消息接受或者处理过程中遭遇到异常错误ID=" + uuid.toString()
+						+ ",错误已经转储请到控制台查看。");
 			// 转储错误对象
 			ErrorExceptionBean errorExceptionBean = new ErrorExceptionBean(
 					uuid, e);
@@ -70,7 +76,11 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 			this.unsubscribe(channel);
 			// 将本线程从正常线程转储链表中删除
 			MQThreadsManagementD.getRecThreads().remove(Thread.currentThread());
-			System.out.println("错误消息、当前处理消息、异常线程对象已经被转储。线程应正常退出");
+			// 将本线程排入异常线程链表
+			CMCS_ThreadTools.PutIntoErrorList(Thread.currentThread(),
+					MQThreadsManagementD.getInstance());
+			if (CMCS_ConstantsTable.DEBUG)
+				System.out.println("错误消息、当前处理消息、异常线程对象已经被转储。线程应正常退出");
 		}
 		//
 		/*

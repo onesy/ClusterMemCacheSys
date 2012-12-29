@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class SerializeUtill {
+public class CMCS_SerializeUtill {
 	
 	public static byte[] Serialize(Object object){
 		ObjectOutputStream objectOutputStream = null;

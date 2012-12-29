@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.onesy.tools.FileUtil;
+import org.onesy.tools.CMCS_ConstantsTable;
+import org.onesy.tools.CMCS_FileUtil;
 
 public class ClusterInfoMap {
 
@@ -18,11 +19,8 @@ public class ClusterInfoMap {
 	private File nodesFolder;
 
 	/**
-	 * SYSTEM CONFIGURE LIST
-	 * ------------------------------
-	 * logPath
-	 * receiverCount
-	 * senderCount
+	 * SYSTEM CONFIGURE LIST ------------------------------ logPath
+	 * receiverCount senderCount
 	 * 
 	 * ------------------------------
 	 */
@@ -92,12 +90,12 @@ public class ClusterInfoMap {
 
 		boolean exitFlag = false;
 
-		exitFlag |= FileUtil.FileCheckCreate(dir, true);
-		exitFlag |= FileUtil.FileCheckCreate(SysConfigure, false);
-		exitFlag |= FileUtil.FileCheckCreate(localFolder, true);
-		exitFlag |= FileUtil.FileCheckCreate(nodesFolder, true);
-		exitFlag |= FileUtil.FileCheckCreate(localfile, false);
-		exitFlag |= FileUtil.FileCheckCreate(nodefile, false);
+		exitFlag |= CMCS_FileUtil.FileCheckCreate(dir, true);
+		exitFlag |= CMCS_FileUtil.FileCheckCreate(SysConfigure, false);
+		exitFlag |= CMCS_FileUtil.FileCheckCreate(localFolder, true);
+		exitFlag |= CMCS_FileUtil.FileCheckCreate(nodesFolder, true);
+		exitFlag |= CMCS_FileUtil.FileCheckCreate(localfile, false);
+		exitFlag |= CMCS_FileUtil.FileCheckCreate(nodefile, false);
 		return exitFlag;
 	}
 
@@ -108,9 +106,10 @@ public class ClusterInfoMap {
 		Properties propertiesLocal = null;
 		Properties propertiesNodes = null;
 		try {
-			ClusterInfoMap.properties = FileUtil.getAsProperties(SysConfigure);
-			propertiesLocal = FileUtil.getAsProperties(localfile);
-			propertiesNodes = FileUtil.getAsProperties(nodefile);
+			ClusterInfoMap.properties = CMCS_FileUtil
+					.getAsProperties(SysConfigure);
+			propertiesLocal = CMCS_FileUtil.getAsProperties(localfile);
+			propertiesNodes = CMCS_FileUtil.getAsProperties(nodefile);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,13 +124,14 @@ public class ClusterInfoMap {
 			String path = propertiesNodes.getProperty(ClusterInfoMap.properties
 					.getProperty("prefix") + "_" + i);
 			if (null == path) {
-				System.err.println("第 " + i + " 个节点文件未能找到，程序认为已经到达配置节点的末端");
+				if (CMCS_ConstantsTable.DEBUG)
+					System.err.println("第 " + i + " 个节点文件未能找到，程序认为已经到达配置节点的末端");
 				break;
 			}
 			Properties tmpProper = null;
-			tmpProper = FileUtil.getAsProperties(new File(nodesFolder
+			tmpProper = CMCS_FileUtil.getAsProperties(new File(nodesFolder
 					+ File.separator + path));
-			if (null == tmpProper) {
+			if (null == tmpProper && CMCS_ConstantsTable.DEBUG) {
 				System.err.println("文件"
 						+ new File(nodesFolder + File.separator + path)
 								.getAbsolutePath() + "未能找到");
@@ -162,7 +162,8 @@ public class ClusterInfoMap {
 
 	private void NodeCreater(String kind, String Key, String host, int port,
 			int DB, String passwd, String Channel, String name) {
-		if (host == null || 0 == port || Channel == null) {
+		if ((host == null || 0 == port || Channel == null)
+				&& CMCS_ConstantsTable.DEBUG) {
 			System.err.println("节点信息不完全，放弃生成该节点");
 			return;
 		}
@@ -171,7 +172,8 @@ public class ClusterInfoMap {
 		}
 
 		if (kind.equalsIgnoreCase("LOCALNODE")) {
-			System.err.println("LOCALNODE:" + host + ":" + port + ":" + DB);
+			if (CMCS_ConstantsTable.DEBUG)
+				System.err.println("LOCALNODE:" + host + ":" + port + ":" + DB);
 			ClusterInfoMap.LocalNodeInfo.put("HOST", host);
 			ClusterInfoMap.LocalNodeInfo.put("PORT", port + "");
 			ClusterInfoMap.LocalNodeInfo.put("DB", DB + "");
