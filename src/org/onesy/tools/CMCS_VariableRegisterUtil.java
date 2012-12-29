@@ -8,8 +8,13 @@ public class CMCS_VariableRegisterUtil {
 	
 	private static ConcurrentHashMap<Object, Object> CMCS_RegisterHashMap = new ConcurrentHashMap<Object, Object>();
 	
-	public void Register(Object key, Object value){
-		
+	public void RegisterSET(Object key, Object value){
+		CMCS_VariableRegisterUtil.getCMCS_RegisterHashMap().put(key, value);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <clazz> clazz RegisterGet(Object key, @SuppressWarnings("rawtypes") Class clazz) {
+		return (clazz)CMCS_VariableRegisterUtil.getCMCS_RegisterHashMap().get(key);
 	}
 
 	public static ConcurrentHashMap<Object, Object> getCMCS_RegisterHashMap() {
