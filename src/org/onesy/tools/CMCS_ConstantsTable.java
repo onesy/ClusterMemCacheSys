@@ -15,10 +15,8 @@ public class CMCS_ConstantsTable {
 	public final static boolean CHECKTHREAD_DEBUG = false;
 	// MQ管理类内部使用3
 	public final static boolean MQ_EXCEPTION_DEBUG = false;
-	
 	// MQSendD内部使用1
 	public final static boolean MQSendD_DEBUG = true;
-	
 	// MQRecD内部使用1
 	public final static boolean MQRecD_DEBUG = true;
 

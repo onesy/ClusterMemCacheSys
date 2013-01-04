@@ -31,17 +31,23 @@ public class ClusterInfoMap {
 	private File localfile;
 
 	/**
-	 * Key = node_x.properties
+	 * Key = node_x.properties，即记录PaxosNodes信息
 	 */
 	public static ConcurrentHashMap<String, PaxosNode> PaxosNodes = new ConcurrentHashMap<String, PaxosNode>();
 
+	/**
+	 * 所有PaxosNodes的key都被记录在这个ArrayList中，这样做可以不许要遍历hash表提升效率。
+	 */
 	public static ArrayList<String> KeySet = new ArrayList<String>();
 
+	/**
+	 * 记录本地节点信息
+	 */
 	public static ConcurrentHashMap<String, String> LocalNodeInfo = new ConcurrentHashMap<String, String>();
 
 	public static Properties properties;
 
-	public synchronized static ClusterInfoMap getInstanceC() {
+	public synchronized static ClusterInfoMap getInstance() {
 		if (null == ClusterInfoMap.clusterInfoMap) {
 			ClusterInfoMap.clusterInfoMap = new ClusterInfoMap();
 		}

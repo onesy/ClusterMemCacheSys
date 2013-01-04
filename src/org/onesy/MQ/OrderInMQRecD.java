@@ -50,6 +50,10 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 			return OrderInMQRecD.orderInMQRec;
 		}
 	}
+	
+	public void MsgProcess(String msg){
+		
+	}
 
 	@Override
 	public void onMessage(String channel, String message) {
@@ -58,6 +62,7 @@ public class OrderInMQRecD extends JedisPubSub implements Runnable {
 			if (CMCS_ConstantsTable.MQRecD_DEBUG)
 				System.out.println("count:" + ++count + " Channel:" + channel
 						+ " message:" + message);
+			this.MsgProcess(message);
 		} catch (Exception e) {
 			// TODO: handle exception
 			// 转储一个异常对象class = MQRecErrOccuBean
