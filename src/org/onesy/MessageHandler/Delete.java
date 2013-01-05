@@ -25,4 +25,10 @@ public class Delete extends MessageHandlerBase {
 
 	}
 
+	@Override
+	public void Process(String content) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

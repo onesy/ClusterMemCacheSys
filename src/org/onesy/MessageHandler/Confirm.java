@@ -42,4 +42,10 @@ public class Confirm extends MessageHandlerBase {
 
 	}
 
+	@Override
+	public void Process(String content) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -25,5 +25,10 @@ public class VotLeader extends MessageHandlerBase {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public void Process(String content) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

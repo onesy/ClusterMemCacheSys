@@ -1,36 +1,38 @@
 package org.onesy.MessageHandler;
 
+
+import org.onesy.tools.SolidConfigure;
+
 import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 public abstract class MessageHandlerBase {
-	
+	/**
+	 * 注册所有MessageHandler对象，初始化时候一次加载完成，存入hashtable
+	 * 使用的时候就可以不必反射去实例化，直接取就是了。
+	 */
 	public static Hashtable HandlerRegister = new Hashtable();
 	
 	/**
-	 * author = host::port::passwd
-	 * machineId = long
-	 * status = proposed/accepted
-	 * category = 
-	 * operation : set get del
-	 * management : VotLeader VotReceipt DesignateLeader VotWatcher DesignateWatcher 
-	 * LeaderASK LeaderAS WatcherASK WatcherAS VersionREQ VersionRESPConfirm ShutdownREQ
-	 * content = different type
-	 * 节点需要记录所有proposed的message一段时间，以等待status 转变为 accepted
-	 * 最终
-	 * message 形如
-	 * 127.0.0.1::6379::passwd::123456789098765321::proposed::VotLeader::{内部结构不干涉但要附上version}
+	 * :: = \r\r\n\n paxos message =
+	 * PAXOS_BABY::host::port::password::increamentNo
+	 * ::Category::DB::backup0::backup1::backup2
+	 * ::backup3::backup4::backup5::backup6::backup7::backup8::content content =
+	 * {.....}
+	 * 
 	 */
-	private String authorHost ;
+	private String host ;
 	
 	private int port ;
 	
 	private String passwd ;
 	
-	private Long machineId ;
+	private Long increamentNo ;
 	
 	private String status ;
 	
-	private String HandlerName;
+	private String Category;
+	
+	private int DB;
 	
 	private MessageHandlerBase handler;
 	
@@ -38,16 +40,36 @@ public abstract class MessageHandlerBase {
 	
 	public MessageHandlerBase(String Message){
 		
-		String[] messageSlice = Message.split("::");
-		this.setAuthorHost(messageSlice[0]);
-		this.setPort(Integer.parseInt(messageSlice[1]));
-		this.setPasswd(messageSlice[2]);
-		this.setMachineId(Long.parseLong(messageSlice[3]));
-		this.setStatus(messageSlice[4]);
-		this.setContent(messageSlice[6]);
-		this.setHandlerName(messageSlice[5]);
+		this.OrderAnalasy(Message);
 		
 	}
+	public void OrderAnalasy(String msg) {
+		String content = "";
+		String[] params = msg.split(SolidConfigure.PaxosOrderSplitor);
+		// 处理结尾的content中的\r\r\n\n
+		for (int i = 16; i < params.length; i++) {
+			content += params[i] + SolidConfigure.PaxosOrderSplitor;
+		}
+		content = content.substring(0, content.length() - 4);
+		this.setHost(params[1]);
+		this.setPort(Integer.parseInt(params[2]));
+		this.setPasswd(params[3]);
+		this.setIncreamentNo(Long.parseLong(params[4]));
+		this.setCategory(params[5]);
+		this.setDB(Integer.parseInt(params[6]));
+		this.setContent(content);
+		//预备位置不做处理今后如有需要需要进行调整
+	}
+	
+	public void InitMessageHandlers(){
+		初始化子类
+	}
+	
+	public void getInstanceFromRegi(String msg){
+		通过调用子类的OrderAnalasy()方法获得一个全新的对象
+	}
+	
+	public abstract void Process(String content);
 	
 	public abstract void ProcessContent();
 	
@@ -79,12 +101,12 @@ public abstract class MessageHandlerBase {
 		this.status = status;
 	}
 
-	public Long getMachineId() {
-		return machineId;
+	public Long getIncreamentNo() {
+		return increamentNo;
 	}
 
-	public void setMachineId(Long machineId) {
-		this.machineId = machineId;
+	public void setIncreamentNo(Long increamentNo) {
+		this.increamentNo = increamentNo;
 	}
 
 	public String getPasswd() {
@@ -103,20 +125,26 @@ public abstract class MessageHandlerBase {
 		this.port = port;
 	}
 
-	public String getAuthorHost() {
-		return authorHost;
+	public String getHost() {
+		return host;
 	}
 
-	public void setAuthorHost(String authorHost) {
-		this.authorHost = authorHost;
+	public void setHost(String host) {
+		this.host = host;
 	}
 
-	public String getHandlerName() {
-		return HandlerName;
+	public String getCategory() {
+		return Category;
 	}
 
-	public void setHandlerName(String handlerName) {
-		HandlerName = handlerName;
+	public void setCategory(String Category) {
+		this.Category = Category;
+	}
+	public int getDB() {
+		return DB;
+	}
+	public void setDB(int dB) {
+		DB = dB;
 	}
 
 }
