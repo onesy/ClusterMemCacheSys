@@ -1,17 +1,17 @@
 package org.onesy.MessageHandler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.onesy.tools.SolidConfigure;
-
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 public abstract class MessageHandlerBase {
 	/**
-	 * 注册所有MessageHandler对象，初始化时候一次加载完成，存入hashtable
-	 * 使用的时候就可以不必反射去实例化，直接取就是了。
+	 * 注册所有MessageHandler对象，初始化时候一次加载完成，存入hashtable 使用的时候就可以不必反射去实例化，直接取就是了。
 	 */
-	public static Hashtable HandlerRegister = new Hashtable();
-	
+	public static volatile ConcurrentHashMap<String, MessageHandlerBase> HandlerRegister = new ConcurrentHashMap<String, MessageHandlerBase>();
+
 	/**
 	 * :: = \r\r\n\n paxos message =
 	 * PAXOS_BABY::host::port::password::increamentNo
@@ -20,29 +20,37 @@ public abstract class MessageHandlerBase {
 	 * {.....}
 	 * 
 	 */
-	private String host ;
-	
-	private int port ;
-	
-	private String passwd ;
-	
-	private Long increamentNo ;
-	
-	private String status ;
-	
+	private String host;
+
+	private int port;
+
+	private String passwd;
+
+	private Long increamentNo;
+
+	private String status;
+
 	private String Category;
-	
+
 	private int DB;
-	
+
 	private MessageHandlerBase handler;
-	
+
 	private String Content;
-	
-	public MessageHandlerBase(String Message){
-		
+
+	public MessageHandlerBase(String Message) {
+
 		this.OrderAnalasy(Message);
+		synchronized (MessageHandlerBase.HandlerRegister) {
+
+			if (MessageHandlerBase.HandlerRegister.get("root") == null) {
+				this.InitMessageHandlers();
+			}
+		}
 		
+
 	}
+
 	public void OrderAnalasy(String msg) {
 		String content = "";
 		String[] params = msg.split(SolidConfigure.PaxosOrderSplitor);
@@ -58,23 +66,126 @@ public abstract class MessageHandlerBase {
 		this.setCategory(params[5]);
 		this.setDB(Integer.parseInt(params[6]));
 		this.setContent(content);
-		//预备位置不做处理今后如有需要需要进行调整
+		// 预备位置不做处理今后如有需要需要进行调整
 	}
-	
-	public void InitMessageHandlers(){
-		初始化子类
+
+	public String[] BakUpFiller(String[] contents) {
+		int contenlength;
+		String[] filler;
+		if (contents == null) {
+			contenlength = 0;
+		} else {
+			contenlength = contents.length;
+		}
+		filler = new String[9 - contenlength];
+		for (int i = 0; i < filler.length; i++) {
+			filler[i] = SolidConfigure.BakUpFiller;
+		}
+		return ArrayUtils.addAll(contents, filler);
 	}
-	
-	public void getInstanceFromRegi(String msg){
-		通过调用子类的OrderAnalasy()方法获得一个全新的对象
+
+	public String OrderStr(String host, int port, String passwd,
+			long increamentNo, String Category, String[] bakups) {
+		if (bakups == null) {
+			bakups = BakUpFiller(bakups);
+		}
+		String order = SolidConfigure.OrderHead
+				+ SolidConfigure.PaxosOrderSplitor + host
+				+ SolidConfigure.PaxosOrderSplitor + port
+				+ SolidConfigure.PaxosOrderSplitor + passwd
+				+ SolidConfigure.PaxosOrderSplitor + increamentNo
+				+ SolidConfigure.PaxosOrderSplitor + Category
+				+ SolidConfigure.PaxosOrderSplitor + bakups[0]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[1]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[2]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[3]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[4]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[5]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[6]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[7]
+				+ SolidConfigure.PaxosOrderSplitor + bakups[8]
+				+ SolidConfigure.PaxosOrderSplitor
+				+ "{ther is\r\r\n\n nothing}";
+		return order;
 	}
-	
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void InitMessageHandlers() {
+		// 注册根对象，所有的访问都是从这里开始的
+		MessageHandlerBase.HandlerRegister.put(
+				"root",
+				new Root(this.OrderStr(SolidConfigure.INIT, 0,
+						SolidConfigure.INIT, 0, "ROOT", null)));
+		// 初始化子类,并注册
+		for (int i = 0; i < SolidConfigure.HandlerKeys.length; i++) {
+			String clazzPath = SolidConfigure.OdrPkgPrefix
+					+ SolidConfigure.HandlerKeys[i];
+			try {
+				Class clazz = Class.forName(clazzPath);
+				MessageHandlerBase messageHandlerBase = (MessageHandlerBase) clazz
+						.getConstructor(String.class).newInstance(
+								this.OrderStr(SolidConfigure.INIT, 0,
+										SolidConfigure.INIT, 0,
+										SolidConfigure.HandlerKeys[i], null));
+				if (messageHandlerBase != null) {
+					MessageHandlerBase.HandlerRegister.put(
+							SolidConfigure.HandlerKeys[i], messageHandlerBase);
+				} else {
+					// 错误代码尚未统一，别高兴的太早
+					System.err.println("Handler初始化错误！程序退出");
+					System.exit(-2);
+				}
+				// 这个异常抛得也太high了嘛。。。。。。。
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * TODO 未测试,其工作原理还需要修改
+	 * 
+	 * @param msg
+	 * @return
+	 */
+	public synchronized MessageHandlerBase getInstanceFromRegi(String msg) {
+		// 通过调用子类的OrderAnalasy()方法获得一个全新的对象
+		// 未完成，通过root对象去访问其他的对象
+		MessageHandlerBase messageHandlerBase = MessageHandlerBase.HandlerRegister
+				.get("root");
+		messageHandlerBase.OrderAnalasy(msg);
+		String key = messageHandlerBase.Category;
+		MessageHandlerBase targetObj = MessageHandlerBase.HandlerRegister
+				.get(key);
+		targetObj.OrderAnalasy(msg);
+		return targetObj;
+	}
+
 	public abstract void Process(String content);
-	
+
 	public abstract void ProcessContent();
-	
+
 	public abstract void push();
-	
+
 	public abstract void pull();
 
 	public String getContent() {
@@ -140,9 +251,11 @@ public abstract class MessageHandlerBase {
 	public void setCategory(String Category) {
 		this.Category = Category;
 	}
+
 	public int getDB() {
 		return DB;
 	}
+
 	public void setDB(int dB) {
 		DB = dB;
 	}
