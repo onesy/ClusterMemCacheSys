@@ -41,14 +41,6 @@ public abstract class MessageHandlerBase {
 	public MessageHandlerBase(String Message) {
 
 		this.OrderAnalasy(Message);
-		synchronized (MessageHandlerBase.HandlerRegister) {
-
-			if (MessageHandlerBase.HandlerRegister.get("root") == null) {
-				this.InitMessageHandlers();
-			}
-		}
-		
-
 	}
 
 	public void OrderAnalasy(String msg) {
@@ -69,7 +61,7 @@ public abstract class MessageHandlerBase {
 		// 预备位置不做处理今后如有需要需要进行调整
 	}
 
-	public String[] BakUpFiller(String[] contents) {
+	public static String[] BakUpFiller(String[] contents) {
 		int contenlength;
 		String[] filler;
 		if (contents == null) {
@@ -84,8 +76,9 @@ public abstract class MessageHandlerBase {
 		return ArrayUtils.addAll(contents, filler);
 	}
 
-	public String OrderStr(String host, int port, String passwd,
-			long increamentNo, String Category, String[] bakups) {
+	public static String OrderStr(String host, int port, String passwd,
+			long increamentNo, String Category, int DB, String Content,
+			String[] bakups) {
 		if (bakups == null) {
 			bakups = BakUpFiller(bakups);
 		}
@@ -95,6 +88,7 @@ public abstract class MessageHandlerBase {
 				+ SolidConfigure.PaxosOrderSplitor + passwd
 				+ SolidConfigure.PaxosOrderSplitor + increamentNo
 				+ SolidConfigure.PaxosOrderSplitor + Category
+				+ SolidConfigure.PaxosOrderSplitor + DB
 				+ SolidConfigure.PaxosOrderSplitor + bakups[0]
 				+ SolidConfigure.PaxosOrderSplitor + bakups[1]
 				+ SolidConfigure.PaxosOrderSplitor + bakups[2]
@@ -104,18 +98,12 @@ public abstract class MessageHandlerBase {
 				+ SolidConfigure.PaxosOrderSplitor + bakups[6]
 				+ SolidConfigure.PaxosOrderSplitor + bakups[7]
 				+ SolidConfigure.PaxosOrderSplitor + bakups[8]
-				+ SolidConfigure.PaxosOrderSplitor
-				+ "{ther is\r\r\n\n nothing}";
+				+ SolidConfigure.PaxosOrderSplitor + "{" + Content + "}";
 		return order;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void InitMessageHandlers() {
-		// 注册根对象，所有的访问都是从这里开始的
-		MessageHandlerBase.HandlerRegister.put(
-				"root",
-				new Root(this.OrderStr(SolidConfigure.INIT, 0,
-						SolidConfigure.INIT, 0, "ROOT", null)));
+	public static void InitMessageHandlers() {
 		// 初始化子类,并注册
 		for (int i = 0; i < SolidConfigure.HandlerKeys.length; i++) {
 			String clazzPath = SolidConfigure.OdrPkgPrefix
@@ -123,10 +111,10 @@ public abstract class MessageHandlerBase {
 			try {
 				Class clazz = Class.forName(clazzPath);
 				MessageHandlerBase messageHandlerBase = (MessageHandlerBase) clazz
-						.getConstructor(String.class).newInstance(
-								this.OrderStr(SolidConfigure.INIT, 0,
+						.getConstructor(String.class).newInstance(//String host, int port, String passwd, long increamentNo, String Category, int DB, String Content, String[] bakups
+								OrderStr(SolidConfigure.INIT, 0,
 										SolidConfigure.INIT, 0,
-										SolidConfigure.HandlerKeys[i], null));
+										SolidConfigure.HandlerKeys[i], 0, SolidConfigure.INIT, null));
 				if (messageHandlerBase != null) {
 					MessageHandlerBase.HandlerRegister.put(
 							SolidConfigure.HandlerKeys[i], messageHandlerBase);
@@ -166,18 +154,33 @@ public abstract class MessageHandlerBase {
 	 * 
 	 * @param msg
 	 * @return
+	 * @deprecated 废弃,切勿使用,需要取得HandlerRegister中的MeesageHandlerBase子类对象请使用替代方法
+	 *             {@link getHandler()}
 	 */
 	public synchronized MessageHandlerBase getInstanceFromRegi(String msg) {
 		// 通过调用子类的OrderAnalasy()方法获得一个全新的对象
 		// 未完成，通过root对象去访问其他的对象
 		MessageHandlerBase messageHandlerBase = MessageHandlerBase.HandlerRegister
-				.get("root");
+				.get(msg.split(SolidConfigure.PaxosOrderSplitor)[5]);
 		messageHandlerBase.OrderAnalasy(msg);
 		String key = messageHandlerBase.Category;
 		MessageHandlerBase targetObj = MessageHandlerBase.HandlerRegister
 				.get(key);
 		targetObj.OrderAnalasy(msg);
 		return targetObj;
+	}
+
+	/**
+	 * @description 通过该方法取得一个HandlerRegister中的MessageHandlerBase对象
+	 * @Thread_UnSafe 取得的对象可能其他线程也已经取到，所以对该单元的操作需要锁定取得的对象
+	 * @param msg
+	 * @return
+	 */
+	public static MessageHandlerBase getHandler(String msg) {
+		// 取得当前的对应的Category
+		return MessageHandlerBase.HandlerRegister
+				.get(msg.split(SolidConfigure.PaxosOrderSplitor)[SolidConfigure.CategoryPosition]);
+
 	}
 
 	public abstract void Process(String content);
