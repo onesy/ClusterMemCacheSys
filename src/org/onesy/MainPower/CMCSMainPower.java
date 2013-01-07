@@ -3,6 +3,7 @@ package org.onesy.MainPower;
 import org.onesy.MQ.MQThreadsManagementD;
 import org.onesy.MessageHandler.MessageHandlerBase;
 import org.onesy.PaxosAl.ClusterInfoMap;
+import org.onesy.test.RegisterIterator;
 import org.onesy.tools.CMCS_ConstantsTable;
 import org.onesy.tools.CMCS_VariableRegisterUtil;
 
@@ -39,6 +40,7 @@ public class CMCSMainPower {
 		// 初始化MessageHandler的HandlerRegister
 		MessageHandlerBase.InitMessageHandlers();
 		//
+		RegisterIterator.IteratorRegister();
 
 	}
 

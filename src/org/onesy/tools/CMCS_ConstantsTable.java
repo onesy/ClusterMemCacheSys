@@ -32,8 +32,8 @@ public class CMCS_ConstantsTable {
 	 */
 	public final static boolean MQRecD_DEBUG = true;
 	/**
-	 *  MessageHandlerBase test
+	 *  MessageHandlerBase 测试
 	 */
-	public final static boolean MHB_DEBUG = true;
+	public final static boolean MHB_DEBUG = false;
 
 }

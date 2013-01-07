@@ -21,6 +21,7 @@ public class OrderInMQSendD implements Runnable {
 			System.out.println("a OrderInMQSendD run");
 		for (;;) {
 			try {
+				//TODO 需要修改！
 				order = OrderBufferLevel_3.OutBufferQueue.poll();
 				if (null != order) {
 					Jedis jedis = new Jedis(order.targetHost, order.port);// <-

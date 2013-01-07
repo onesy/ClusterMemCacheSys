@@ -100,7 +100,7 @@ public abstract class MessageHandlerBase {
 				+ SolidConfigure.PaxosOrderSplitor + bakups[8]
 				+ SolidConfigure.PaxosOrderSplitor + "{" + Content + "}";
 		return order;
-	}
+	} 
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void InitMessageHandlers() {
