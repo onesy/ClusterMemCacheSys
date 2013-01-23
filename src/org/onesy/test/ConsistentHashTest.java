@@ -36,16 +36,16 @@ public class ConsistentHashTest {
 		ArrayList<ArrayList<NodeInfo>> values = new ArrayList<ArrayList<NodeInfo>>();
 
 		ArrayList<NodeInfo> No1 = new ArrayList<NodeInfo>();
-		No1.add(new NodeInfo(0, "123", 2, "127.0.0.1", 1023, "dior", 0));
-		No1.add(new NodeInfo(1, "123", 2, "127.0.0.1", 1023, "dior", 0));
+		No1.add(new NodeInfo(0, "123", 2, "127.0.0.1", 1023, "pubDior", "subDior", 0, 0));
+		No1.add(new NodeInfo(1, "123", 2, "127.0.0.1", 1023, "pubDior", "subDior", 0, 1));
 
 		ArrayList<NodeInfo> No2 = new ArrayList<NodeInfo>();
-		No2.add(new NodeInfo(0, "111", 2, "127.0.0.1", 1023, "channel", 0));
-		No2.add(new NodeInfo(1, "111", 2, "127.0.0.1", 1023, "channel", 0));
+		No2.add(new NodeInfo(0, "111", 2, "127.0.0.1", 1023, "pubChannel", "subChannel", 0, 0));
+		No2.add(new NodeInfo(1, "111", 2, "127.0.0.1", 1023, "pubchannel", "subChannel", 0, 1));
 
 		ArrayList<NodeInfo> No3 = new ArrayList<NodeInfo>();
-		No3.add(new NodeInfo(0, "322", 2, "127.0.0.1", 1023, "oly", 0));
-		No3.add(new NodeInfo(1, "322", 2, "127.0.0.1", 1023, "oly", 0));
+		No3.add(new NodeInfo(0, "322", 2, "127.0.0.1", 1023, "pubOly", "subOly", 0, 0));
+		No3.add(new NodeInfo(1, "322", 2, "127.0.0.1", 1023, "pubOly", "subOly", 0, 1));
 
 		values.add(No1);
 		values.add(No2);
