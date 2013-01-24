@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.onesy.Redundancy_Balance.CircleHashSpace;
 import org.onesy.Redundancy_Balance.NodeInfo;
 import org.onesy.Redundancy_Balance.OrganizationNodesTable;
+import org.onesy.Redundancy_Balance.RedundancyBalanceModule;
 
 public class ConsistentHashTest {
 
@@ -22,6 +23,7 @@ public class ConsistentHashTest {
 		// BigInteger("2")));
 		// System.exit(0);
 
+		long times = System.currentTimeMillis();
 		String[] magics = new String[] { "123", "322", "1203", "565", "456",
 				"1000", "4565" };
 
@@ -69,7 +71,26 @@ public class ConsistentHashTest {
 		CircleHashSpace.setMagicArray(magics4src);
 
 		CircleHashSpace circleHashSpace = CircleHashSpace.getInstance();
+		
+		RequestInfo AliQI = new RequestInfo("ali", 19, "aliMagic");
+		
+		RequestInfo LaiQI = new RequestInfo("lai", 20, "laiMagic");
+		
+		RequestInfo TuQI = new RequestInfo("Tu", 21, "tuMagic");
+		
+		ArrayList<NodeInfo> targetArrayList = RedundancyBalanceModule.GetOrganization(AliQI);
+		
+		for (NodeInfo nodeInfo : targetArrayList) {
+			System.err.println(nodeInfo.getMagic());
+		}
 
+		long timee = System.currentTimeMillis();
+		
+		System.err.println(timee - times);
+		
+		long nanos = System.nanoTime();
+		
+		long nanoe = System.nanoTime();
 		/**
 		 * 流程说明：
 		 * 
