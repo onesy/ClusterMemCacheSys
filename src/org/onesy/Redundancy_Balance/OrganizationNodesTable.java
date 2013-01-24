@@ -1,7 +1,9 @@
 package org.onesy.Redundancy_Balance;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import org.onesy.tools.CMCS_Collection;
 
 public class OrganizationNodesTable {
 
@@ -37,8 +39,9 @@ public class OrganizationNodesTable {
 			for (ArrayList<NodeInfo> value : values) {
 				if (magics[i].toString().equals(value.get(0).getMagic())) {
 					OrganizationNodesTable.MagicToNodeInfo_Table.put(
-							CircleHashSpace.calculateMD5(magics[i].toString())
-									.abs().toString(), value);
+							new BigInteger(CMCS_Collection
+									.calculateMD5(magics[i])).abs().toString(),
+							value);
 					break;
 				}
 			}
@@ -52,26 +55,26 @@ public class OrganizationNodesTable {
 		return MagicToNodeInfo_Table;
 	}
 
-	public static void setMagicToNodeInfo_Table(
+	protected static void setMagicToNodeInfo_Table(
 			ConcurrentHashMap<String, ArrayList<NodeInfo>> magicToNodeInfo_Table) {
 		OrganizationNodesTable.MagicToNodeInfo_Table = magicToNodeInfo_Table;
 	}
 
 	/**
 	 * 如果需要更改一个键对应的数组，只需要调用这个方法使用相同的键进行覆盖即可
+	 * 
 	 * @param key
 	 * @param value
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T, E> void addKV(T key, ArrayList<E> value) {
+	protected static <T, E> void addKV(T key, ArrayList<E> value) {
 		OrganizationNodesTable.getInstance();
 		MagicToNodeInfo_Table.put(key.toString(), (ArrayList<NodeInfo>) value);
 	}
 
-	public static <T> boolean delKey(T key) {
+	protected static <T> boolean delKey(T key) {
 		try {
-			if (null == MagicToNodeInfo_Table.remove(CircleHashSpace
-					.calculateMD5(key.toString()))) {
+			if (null == MagicToNodeInfo_Table.remove(CMCS_Collection.calculateMD5(key))) {
 				return false;
 			} else {
 				return true;

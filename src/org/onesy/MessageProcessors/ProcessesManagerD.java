@@ -8,6 +8,6 @@ public class ProcessesManagerD {
 	
 	private static Vector<Thread> DeadProcess = new Vector<Thread>();
 	
-	private static Vector<>
+//	private static Vector<>
 
 }

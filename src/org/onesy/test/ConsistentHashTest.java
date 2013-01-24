@@ -80,12 +80,9 @@ public class ConsistentHashTest {
 		 * for (String value : CircleHashSpace.getMagicArray()) {
 		 * System.err.println(value); }
 		 */
-		String Magic = CircleHashSpace.Search4Magic(userMagic);
-		String Magic2 = CircleHashSpace.Search4Magic(userMagic2);
-		String Magic3 = CircleHashSpace.Search4Magic(userMagic3);
 		
-		ArrayList<NodeInfo> NIArr = hashtable.get(Magic);
-		System.err.println("Stop!");
+		
+		
 		/**
 		 * test case end
 		 */
