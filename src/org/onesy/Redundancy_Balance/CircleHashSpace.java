@@ -3,7 +3,7 @@ package org.onesy.Redundancy_Balance;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import org.onesy.tools.CMCS_Collection;
+import org.onesy.tools.Collections;
 
 public class CircleHashSpace {
 
@@ -77,18 +77,18 @@ public class CircleHashSpace {
 	protected static void add(String magic) {
 		checkInitial();
 		if (MagicArray.size() == 0) {
-			CMCS_Collection.getMD5AbsBigInteger(magic);
-			MagicArray.add(0, CMCS_Collection.getMD5AbsBigInteger(magic).toString());
+			Collections.getMD5AbsBigInteger(magic);
+			MagicArray.add(0, Collections.getMD5AbsBigInteger(magic).toString());
 			return;
 		}
 		for (int i = 0; i < MagicArray.size(); i++) {
-			if (CMCS_Collection.getMD5AbsBigInteger(magic)
+			if (Collections.getMD5AbsBigInteger(magic)
 					.compareTo(new BigInteger(MagicArray.get(i))) < 0) {
-				MagicArray.add(i, CMCS_Collection.getMD5AbsBigInteger(magic).toString());
+				MagicArray.add(i, Collections.getMD5AbsBigInteger(magic).toString());
 				return;
 			}
 		}
-		MagicArray.add(CMCS_Collection.getMD5AbsBigInteger(magic).toString());
+		MagicArray.add(Collections.getMD5AbsBigInteger(magic).toString());
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class CircleHashSpace {
 
 	protected static <T> String Search4Magic(T userMagic) {
 		for (int i = 0; i < MagicArray.size(); i++) {
-			if (new BigInteger(CMCS_Collection.calculateMD5(userMagic))
+			if (new BigInteger(Collections.calculateMD5(userMagic))
 					.abs().compareTo(new BigInteger(MagicArray.get(i)).abs()) <= 0) {
 				return MagicArray.get(i);
 			}

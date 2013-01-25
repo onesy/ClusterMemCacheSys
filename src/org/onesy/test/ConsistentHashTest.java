@@ -80,17 +80,22 @@ public class ConsistentHashTest {
 		
 		ArrayList<NodeInfo> targetArrayList = RedundancyBalanceModule.GetOrganization(AliQI);
 		
+		/**
 		for (NodeInfo nodeInfo : targetArrayList) {
 			System.err.println(nodeInfo.getMagic());
 		}
+		**/
 
 		long timee = System.currentTimeMillis();
 		
 		System.err.println(timee - times);
 		
-		long nanos = System.nanoTime();
+		long nanos = System.currentTimeMillis();
 		
-		long nanoe = System.nanoTime();
+		NodeInfo ni = RedundancyBalanceModule.GetRandomNodeInfoInOrg(AliQI);
+		
+		long nanoe = System.currentTimeMillis();
+		System.err.println(nanoe - nanos);
 		/**
 		 * 流程说明：
 		 * 

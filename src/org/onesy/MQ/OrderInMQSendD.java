@@ -6,7 +6,7 @@ import org.onesy.ErrorProcessor.ErrorExceptionBean;
 import org.onesy.ErrorProcessor.ErrorRememberer;
 import org.onesy.OrderBeans.OutPutOrder;
 import org.onesy.ThreadBuffer.OrderBufferLevel_3;
-import org.onesy.tools.CMCS_ConstantsTable;
+import org.onesy.tools.ConstantsTable;
 
 import redis.clients.jedis.Jedis;
 
@@ -17,7 +17,7 @@ public class OrderInMQSendD implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		if (CMCS_ConstantsTable.DEBUG)
+		if (ConstantsTable.DEBUG)
 			System.out.println("a OrderInMQSendD run");
 		for (;;) {
 			try {
@@ -28,7 +28,7 @@ public class OrderInMQSendD implements Runnable {
 					jedis.publish(order.Channel, order.Content);// <-
 					jedis.quit();
 				}
-				if (CMCS_ConstantsTable.MQSendD_DEBUG) {
+				if (ConstantsTable.MQSendD_DEBUG) {
 					throw new Exception("just dead");
 				}
 
@@ -54,7 +54,7 @@ public class OrderInMQSendD implements Runnable {
 					ErrorRememberer.getErrExceptionsList().add(rBean);
 				}
 				// 退出
-				if (CMCS_ConstantsTable.MQSendD_DEBUG)
+				if (ConstantsTable.MQSendD_DEBUG)
 					System.out.println("a OrderInMQSendD occu a exception!");
 				return;
 			}

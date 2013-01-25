@@ -1,6 +1,6 @@
 package org.onesy.test;
 
-import org.onesy.tools.CMCS_VariableRegisterUtil;
+import org.onesy.tools.VariableRegisterUtil;
 
 public class VariableRegisterTest {
 
@@ -10,8 +10,8 @@ public class VariableRegisterTest {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		CMCS_VariableRegisterUtil.getInstance().RegisterSET("key", "value");
-		System.out.println(CMCS_VariableRegisterUtil.getInstance().RegisterGet("key", String.class));
+		VariableRegisterUtil.getInstance().RegisterSET("key", "value");
+		System.out.println(VariableRegisterUtil.getInstance().RegisterGet("key", String.class));
 
 	}
 

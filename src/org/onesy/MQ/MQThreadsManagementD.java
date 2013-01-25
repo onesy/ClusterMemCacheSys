@@ -6,8 +6,8 @@ import java.util.LinkedList;
 import org.onesy.OrderBeans.MQRecErrOccuBean;
 import org.onesy.OrderBeans.OutPutOrder;
 import org.onesy.PaxosAl.ClusterInfoMap;
-import org.onesy.tools.CMCS_ConstantsTable;
-import org.onesy.tools.CMCS_ThreadTools;
+import org.onesy.tools.ConstantsTable;
+import org.onesy.tools.ThreadTools;
 
 /**
  * 
@@ -42,7 +42,7 @@ public class MQThreadsManagementD implements Runnable {
 		int sendersCount = Integer.parseInt(ClusterInfoMap.properties
 				.getProperty("senderCount"));
 
-		if (CMCS_ConstantsTable.DEBUG)
+		if (ConstantsTable.DEBUG)
 			System.out.println("receiverCount:" + receiversCount
 					+ "  senderCount:" + sendersCount);
 		this.CrtRecverAddToList(receiversCount);
@@ -53,7 +53,7 @@ public class MQThreadsManagementD implements Runnable {
 		for (;;) {
 
 			// 结束异常线程列表中的线程
-			CMCS_ThreadTools.FinishErrorThread();
+			ThreadTools.FinishErrorThread();
 			// 守护进程检查线程们是否正常运行
 			CheckThreads();
 			// CheckThreads("receiverCount", "receiver");
@@ -69,7 +69,7 @@ public class MQThreadsManagementD implements Runnable {
 
 			// 发出错误，记得更改这里，记得接收线程和发送线程的异常处理都需要加入新的线程处理
 
-			if (CMCS_ConstantsTable.MQ_MANAGERD_DEBUG && CMCS_ConstantsTable.DEBUG) {
+			if (ConstantsTable.MQ_MANAGERD_DEBUG && ConstantsTable.DEBUG) {
 				System.exit(-2);
 			}
 
@@ -79,7 +79,7 @@ public class MQThreadsManagementD implements Runnable {
 
 	private void CheckThreads() {
 
-		if (CMCS_ConstantsTable.CHECKTHREAD_DEBUG)
+		if (ConstantsTable.CHECKTHREAD_DEBUG)
 			System.err.println("CheckThreads");
 		int Iter;
 		synchronized (recThreads) {
@@ -88,7 +88,7 @@ public class MQThreadsManagementD implements Runnable {
 					.getProperty("receiverCount")) != recThreads.size()
 					&& (Iter = Integer.parseInt(ClusterInfoMap.properties
 							.getProperty("receiverCount")) - recThreads.size()) > 0) {
-				if (CMCS_ConstantsTable.DEBUG)
+				if (ConstantsTable.DEBUG)
 					System.out.println("已经有：" + Iter + "个receicer线程死亡");
 				for (int i = 0; i < Iter; i++) {
 					Thread th = LocalRecThread();
@@ -103,7 +103,7 @@ public class MQThreadsManagementD implements Runnable {
 					.getProperty("senderCount")) != sendThreads.size()
 					&& (Iter = Integer.parseInt(ClusterInfoMap.properties
 							.getProperty("senderCount")) - sendThreads.size()) > 0) {
-				if (CMCS_ConstantsTable.DEBUG)
+				if (ConstantsTable.DEBUG)
 					System.out.println("已经有：" + Iter + "个sender线程死亡");
 				for (int i = 0; i < Iter; i++) {
 					Thread th = LocalSendThread();
@@ -125,7 +125,7 @@ public class MQThreadsManagementD implements Runnable {
 		for (int i = 0; i < receiversCount; i++) {
 			Thread th = this.LocalRecThread();
 			// TODO 加上这一行，异常线程转储的逻辑需要修改
-			if (CMCS_ConstantsTable.DEBUG) {
+			if (ConstantsTable.DEBUG) {
 				System.out.println("已经成功创建接受者线程");
 			}
 			MQThreadsManagementD.getRecThreads().add(i, th);
@@ -148,7 +148,7 @@ public class MQThreadsManagementD implements Runnable {
 		for (int i = 0; i < sendersCount; i++) {
 			Thread th = this.LocalSendThread();
 			// TODO 加上这一行，异常线程转储的逻辑需要修改
-			if (CMCS_ConstantsTable.DEBUG) {
+			if (ConstantsTable.DEBUG) {
 				System.out.println("已经成功创建发送者线程");
 			}
 			MQThreadsManagementD.getSendThreads().add(i, th);

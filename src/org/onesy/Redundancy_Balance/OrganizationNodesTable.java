@@ -3,7 +3,7 @@ package org.onesy.Redundancy_Balance;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import org.onesy.tools.CMCS_Collection;
+import org.onesy.tools.Collections;
 
 public class OrganizationNodesTable {
 
@@ -39,7 +39,7 @@ public class OrganizationNodesTable {
 			for (ArrayList<NodeInfo> value : values) {
 				if (magics[i].toString().equals(value.get(0).getMagic())) {
 					OrganizationNodesTable.MagicToNodeInfo_Table.put(
-							new BigInteger(CMCS_Collection
+							new BigInteger(Collections
 									.calculateMD5(magics[i])).abs().toString(),
 							value);
 					break;
@@ -74,7 +74,7 @@ public class OrganizationNodesTable {
 
 	protected static <T> boolean delKey(T key) {
 		try {
-			if (null == MagicToNodeInfo_Table.remove(CMCS_Collection.calculateMD5(key))) {
+			if (null == MagicToNodeInfo_Table.remove(Collections.calculateMD5(key))) {
 				return false;
 			} else {
 				return true;
